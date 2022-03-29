@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.tri import Triangulation
 import numpy as np
 
-def plot_frozen_lake(df_summary, terminal_states = [5, 7, 11, 12, 15], size = (4,4) ):
+def plot_frozen_lake(df_summary, terminal_states = [5, 7, 11, 12, 15], size = (4,4)):
 
     # Label dict
     direction_dict = {0:"←", 1:"↓", 2:"→", 3:"↑"}
@@ -23,7 +23,7 @@ def plot_frozen_lake(df_summary, terminal_states = [5, 7, 11, 12, 15], size = (4
     fig, axes = plt.subplots(1, 2, figsize=(16,7))
     fig.suptitle('State Values for Optimal Policy')
 
-    sns.heatmap(returns, annot=True, linewidths=.5, cbar=False, cmap="Blues", ax=axes[0])
+    sns.heatmap(returns, annot=True, linewidths=.5, cbar=False, cmap="Blues", fmt = '.2f', ax=axes[0])
     sns.heatmap(returns, annot=np.array(direction), linewidths=.5, cbar=False, cmap="Blues", fmt = '', ax=axes[1])
 
 def plot_state_action_frozen_lake(df_summary, terminal_states = [5, 7, 11, 12, 15], size = (4,4)):
