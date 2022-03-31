@@ -27,7 +27,7 @@ class MonteCarloExploringStartsAgent():
         self.episode_rewards = []
 
         # Set Random Seed
-        self.rand_generator = np.random.RandomState(0)
+        self.rand_generator = np.random#.RandomState(0)
         
         # Create an array for action-value estimates and initialize it to zero.
         #self.q = np.zeros((self.num_states, self.num_actions)) # The array of action-value estimates.
