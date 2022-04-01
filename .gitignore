@@ -1,6 +1,9 @@
 # Images
 frozen_lake/ppt_images/
 
+# Legacy
+frozen_lake/legacy/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
