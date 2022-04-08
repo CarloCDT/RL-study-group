@@ -5,10 +5,11 @@ class QLearningAgent():
 
     def __init__(self, agent_init_info):
         """
-        Setup for the agent called when the experiment first starts.
+        Setup for the Q-Learning agent.
         
         Args:
-        agent_init_info (dict), the parameters used to initialize the agent. The dictionary contains:
+            agent_init_info (dict), the parameters used to initialize the agent. 
+            The dictionary contains:
         {
             num_states (int): The number of states,
             num_actions (int): The number of actions,
@@ -18,6 +19,7 @@ class QLearningAgent():
         }
         
         """
+
         # Store the parameters provided in agent_init_info.
         self.num_actions = agent_init_info["num_actions"]
         self.num_states = agent_init_info["num_states"]
@@ -26,12 +28,11 @@ class QLearningAgent():
         self.gamma = agent_init_info["gamma"]
 
         # Set Random Seed
-        self.rand_generator = np.random#.RandomState(0)
+        self.rand_generator = np.random.RandomState(0)
         
         # Create an array for action-value estimates and initialize it to zero.
-        self.q = np.zeros((self.num_states, self.num_actions)) # The array of action-value estimates.
+        self.q = np.zeros((self.num_states, self.num_actions))
 
-        
     def agent_start(self, observation):
         """
         The first method called when the episode starts, called after
@@ -112,7 +113,6 @@ class QLearningAgent():
                 ties.append(i)
 
         return self.rand_generator.choice(ties)
-
 
     def create_summary_table(self):
         """

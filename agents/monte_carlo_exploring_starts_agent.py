@@ -5,10 +5,11 @@ class MonteCarloExploringStartsAgent():
 
     def __init__(self, agent_init_info):
         """
-        Setup for the agent called when the experiment first starts.
+        Setup for the Monte Carlo exploring strats agent.
         
         Args:
-        agent_init_info (dict), the parameters used to initialize the agent. The dictionary contains:
+            agent_init_info (dict), the parameters used to initialize the agent. 
+            The dictionary contains:
         {
             num_states (int): The number of states,
             num_actions (int): The number of actions,
@@ -16,6 +17,7 @@ class MonteCarloExploringStartsAgent():
         }
         
         """
+
         # Store the parameters provided in agent_init_info.
         self.num_actions = agent_init_info["num_actions"]
         self.num_states = agent_init_info["num_states"]
@@ -29,17 +31,15 @@ class MonteCarloExploringStartsAgent():
         # Set Random Seed
         self.rand_generator = np.random.RandomState(0)
         
-        # Create an array for action-value estimates and initialize it to zero/random
-        #self.q = np.zeros((self.num_states, self.num_actions)) # The array of action-value estimates.
-        self.q = np.random.random((self.num_states, self.num_actions))  # The array of action-value estimates.
+        # Create an array for state-action value estimates and initialize it to zero.
+        self.q = np.zeros((self.num_states, self.num_actions))
         
         # Create returns array
         self.returns = {}
         for s in range(self.num_states):
             for a in range(self.num_actions):
                 self.returns[(s,a)] = [] 
-
-        
+   
     def agent_start(self, observation):
         """
         The first method called when the episode starts, called after
@@ -97,6 +97,7 @@ class MonteCarloExploringStartsAgent():
 
         # Perform the last update in the episode
         G = 0
+
         for idx in range(len(self.episode_states)):
             G = self.gamma*G + self.episode_rewards[-(idx+1)]
 

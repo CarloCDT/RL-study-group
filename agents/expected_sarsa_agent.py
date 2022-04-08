@@ -4,10 +4,12 @@ import pandas as pd
 class ExpectedSarsaAgent():
 
     def __init__(self, agent_init_info):
-        """Setup for the agent called when the experiment first starts.
+        """
+        Setup for the Expected Sarsa agent.
         
         Args:
-        agent_init_info (dict), the parameters used to initialize the agent. The dictionary contains:
+            agent_init_info (dict), the parameters used to initialize the agent. 
+            The dictionary contains:
         {
             num_states (int): The number of states,
             num_actions (int): The number of actions,
@@ -17,6 +19,7 @@ class ExpectedSarsaAgent():
         }
         
         """
+
         # Store the parameters provided in agent_init_info.
         self.num_actions = agent_init_info["num_actions"]
         self.num_states = agent_init_info["num_states"]
@@ -25,14 +28,14 @@ class ExpectedSarsaAgent():
         self.gamma = agent_init_info["gamma"]
 
         # Set Random Seed
-        self.rand_generator = np.random#.RandomState(0)
+        self.rand_generator = np.random.RandomState(0)
         
         # Create an array for action-value estimates and initialize it to zero.
-        self.q = np.zeros((self.num_states, self.num_actions)) # The array of action-value estimates.
+        self.q = np.zeros((self.num_states, self.num_actions))
 
-        
     def agent_start(self, observation):
-        """The first method called when the episode starts, called after
+        """
+        The first method called when the episode starts, called after
         the environment starts.
         Args:
             observation (int): the state observation from the
@@ -71,7 +74,6 @@ class ExpectedSarsaAgent():
         else:
             action = self.argmax(current_q)
         
-
         q_max = np.max(self.q[state,:])
         pi = np.ones(self.num_actions) * self.epsilon / self.num_actions \
            + (self.q[state,:] == q_max) * (1 - self.epsilon) / np.sum(self.q[state,:] == q_max)
@@ -96,7 +98,6 @@ class ExpectedSarsaAgent():
         # Update values
         self.q[self.prev_state, self.prev_action] += self.alpha * (reward- self.q[self.prev_state, self.prev_action])
 
-        
     def argmax(self, q_values):
         """argmax with random tie-breaking
         Args:
