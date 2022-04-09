@@ -208,7 +208,7 @@ class DynaQPlusAgent():
 
     def create_summary_table(self):
         """
-        Create a pandas sumamry table based on agents q
+        Create a pandas summary table based on agents q
         """
         df_summary = pd.DataFrame(self.q_values)
         df_summary["optimal_action"] = self.q_values.argmax(axis=1)
