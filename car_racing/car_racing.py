@@ -13,7 +13,8 @@ class CarRacingEnvironment(BaseEnvironment):
         Setup for the environment called when the experiment first starts.
         """
         self.env = gym.make("CarRacing-v1", continuous=False)
-        self.env.seed(0)
+        #self.env.seed(0)
+        self.seed = 0
 
     def env_start(self):
         """
@@ -25,7 +26,7 @@ class CarRacingEnvironment(BaseEnvironment):
         """        
         
         reward = 0.0
-        observation = self.env.reset()
+        observation = self.env.reset(seed=self.seed)
         is_terminal = False
                 
         self.reward_obs_term = (reward, observation, is_terminal)
@@ -50,3 +51,12 @@ class CarRacingEnvironment(BaseEnvironment):
         self.reward_obs_term = (reward, current_state, is_terminal)
         
         return self.reward_obs_term
+
+    def env_render(self):
+        self.env.render()
+
+    def env_message(self, message):
+        if message == "get_speed":
+            return np.sqrt(np.square(self.env.car.hull.linearVelocity[0]) + np.square(self.env.car.hull.linearVelocity[1]))
+        else:
+            raise Exception("Unrecognized Message!")

@@ -23,83 +23,82 @@ class RLGlue:
         self.num_steps = None
         self.num_episodes = None
 
-        # Initialize speed
-        self.all_speeds = np.load('speeds.npy', allow_pickle=True)
-
-        # Initialize last speed
-        last_speed = self.all_speeds[0]
-
-        self.speed_dict = [0]
-        self.speed_image_dict = [last_speed]
-
-        for idx, sp in enumerate(self.all_speeds[1:]):
-            if not (sp == last_speed).all():
-                self.speed_dict.append(idx+1)
-                self.speed_image_dict.append(sp)
-
-                # Update Speed
-                last_speed = sp
-
+        # Set front of Car
         self.car_front = [65, 48]
 
     @staticmethod
     def is_road(pixel):
-        if pixel[1]>pixel[0]*1.2 and pixel[1]>pixel[2]*1.2:
+        if pixel[1]>pixel[0]*1.3 and pixel[1]>pixel[2]*1.3:
             # Not grey (probably?)
             return False
         else:
             return True
 
-    def calculate_speed(self, input_img):
-        speed_indicator = input_img[-12:,11:11+5,:]
-        if np.sum(speed_indicator) == 0:
-            return 0
+    @staticmethod
+    def is_void(pixel):
+        if max(pixel)<10:
+            # Not grey (probably?)
+            return True
         else:
-            return np.sum(speed_indicator!=0)
+            return False
 
-        # for idx, sp_img in enumerate(self.speed_image_dict):
-
-        #     if (speed_indicator==sp_img).all():
-        #         return self.speed_dict[idx]
-        
-        # print("Error: Speed not found")
-        # print(speed_indicator)
-        # return -1
+    def calculate_speed(self, input_img):
+        #return self.environment.get_speed()
+        return self.rl_env_message('get_speed')
 
     def transform_state(self, last_state):
 
-        #print("Input funcion", last_state)
-
-        if len(last_state)!=4:
+        if len(last_state)!=6: # I should be able to do this in a better way!
+            
             # Override state
+
+            # Speed
             speed = self.calculate_speed(last_state)
 
             # Front Sensor
-            sensor_front = self.car_front[0]
+            front_sensor = self.car_front[0]
             for i in range(self.car_front[0]):
                 pixel = last_state[self.car_front[0]-i, self.car_front[1], :]
                 if not self.is_road(pixel):
-                    sensor_front = i
+                    front_sensor = i
                     break
 
-            # Left Sensor
-            sensor_left = self.car_front[0]
+            # Front left sensor
+            left_sensor = self.car_front[0]
             for i in range(self.car_front[0]):
                 pixel = last_state[self.car_front[0]-i, self.car_front[1]-i//4, :]
                 if not self.is_road(pixel):
-                    sensor_left = i
+                    left_sensor = i
+                    break
+                
+            # Full left sensor
+            full_left_sensor = self.car_front[1]
+            for i in range(self.car_front[1]):
+                pixel = last_state[self.car_front[0], self.car_front[1]-i, :]
+                if not self.is_road(pixel):
+                    full_left_sensor =  i
                     break
 
-            # Right Sensor
-            sensor_right = self.car_front[0]
+            # Front Right Sensor
+            right_sensor = self.car_front[0]
             for i in range(self.car_front[0]):
                 pixel = last_state[self.car_front[0]-i, self.car_front[1]+i//4, :]
                 if not self.is_road(pixel):
-                    sensor_right = i
+                    right_sensor = i
+                    break
+            
+            # Full right sensor
+            full_right_sensor = 96-self.car_front[1]
+            for i in range(96-self.car_front[1]):
+                pixel = last_state[self.car_front[0], self.car_front[1]+i, :]
+                if not self.is_road(pixel):
+                    full_right_sensor = i
                     break
 
-            return [speed, sensor_front, sensor_left, sensor_right]
+            return [speed, front_sensor, left_sensor, full_left_sensor, right_sensor, full_right_sensor]
+        
         else:
+            print("WARNING: Calling transform_state in a wrong place!")
             return last_state
 
     def rl_init(self, agent_init_info={}, env_init_info={}):
