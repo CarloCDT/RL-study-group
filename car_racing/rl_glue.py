@@ -48,7 +48,7 @@ class RLGlue:
 
     def transform_state(self, last_state):
 
-        if len(last_state)!=6: # I should be able to do this in a better way!
+        if len(last_state)!=8: # I should be able to do this in a better way!
             
             # Override state
 
@@ -93,6 +93,22 @@ class RLGlue:
                 pixel = last_state[self.car_front[0], self.car_front[1]+i, :]
                 if not self.is_road(pixel):
                     full_right_sensor = i
+                    break
+
+            ## Extra Sensors
+            front_road_sensor = self.car_front[0]
+            for i in range(self.car_front[0]):
+                pixel = last_state[self.car_front[0]-i, self.car_front[1], :]
+                if self.is_road(pixel) or np.sum(pixel)==0:
+                    front_road_sensor = i
+                    break
+
+            car_back = [self.car_front[0]+12, self.car_front[1]]
+            back_road_sensor = 96-car_back[0]
+            for i in range(96-car_back[0]):
+                pixel = last_state[car_back[0]+i, car_back[1], :]
+                if self.is_road(pixel) or np.sum(pixel)==0:
+                    back_road_sensor = 0
                     break
 
             return [speed, front_sensor, left_sensor, full_left_sensor, right_sensor, full_right_sensor]

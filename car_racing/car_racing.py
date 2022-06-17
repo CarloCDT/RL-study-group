@@ -13,8 +13,7 @@ class CarRacingEnvironment(BaseEnvironment):
         Setup for the environment called when the experiment first starts.
         """
         self.env = gym.make("CarRacing-v1", continuous=False)
-        #self.env.seed(0)
-        self.seed = 0
+        self.rand_generator = np.random.RandomState(0)
 
     def env_start(self):
         """
@@ -26,7 +25,7 @@ class CarRacingEnvironment(BaseEnvironment):
         """        
         
         reward = 0.0
-        observation = self.env.reset(seed=self.seed)
+        observation = self.env.reset(seed=self.rand_generator.randint(2**31))
         is_terminal = False
                 
         self.reward_obs_term = (reward, observation, is_terminal)
