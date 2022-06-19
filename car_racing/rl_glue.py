@@ -111,7 +111,7 @@ class RLGlue:
                     back_road_sensor = 0
                     break
 
-            return [speed, front_sensor, left_sensor, full_left_sensor, right_sensor, full_right_sensor]
+            return [round(speed, 2), front_sensor, left_sensor, full_left_sensor, right_sensor, full_right_sensor]
         
         else:
             print("WARNING: Calling transform_state in a wrong place!")
