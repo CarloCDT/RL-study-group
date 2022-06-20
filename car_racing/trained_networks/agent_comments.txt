@@ -40,3 +40,38 @@ agent_parameters = {
     'tau': 0.001 # 0.001
 }
 ---------------------------------------------------------------------------------------------------
+Agent 004 (aka agent_albon):
+Start from agent 003, 300 episodes:
+
+# Experiment parameters
+experiment_parameters = {
+    "num_runs" : 1,
+    "num_episodes" : 300,
+    "timeout" : 1000, # timestep limit (set to 500 as default)
+}
+
+# Environment parameters
+environment_parameters = {}
+
+current_env = CarRacingEnvironment
+
+# Agent parameters
+agent_parameters = {
+    'network_config': {
+        'state_dim': 6, # State Dimension (number of inputs)
+        'num_hidden_units': 16, #
+        'num_actions': 5 # Action Space (number of outputs)
+    },
+    'optimizer_config': {
+        'step_size': 1e-4, # 1e-3
+        'beta_m': 0.9,
+        'beta_v': 0.999, # 0.999
+        'epsilon': 1e-8
+    },
+    'replay_buffer_size': 50000,
+    'minibatch_sz': 8,
+    'num_replay_updates_per_step': 2,
+    'gamma': 0.989,
+    'tau': 0.002 # 0.001
+}
+---------------------------------------------------------------------------------------------------
