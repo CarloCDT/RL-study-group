@@ -6,13 +6,14 @@ class ActionValueNetwork:
     def __init__(self, network_config):
 
         self.state_dim = network_config.get("state_dim")
-        self.num_hidden_units = network_config.get("num_hidden_units")
+        self.num_hidden_units_1 = network_config.get("num_hidden_units_1")
+        #self.num_hidden_units_2 = network_config.get("num_hidden_units_2")
         self.num_actions = network_config.get("num_actions")
         
         self.rand_generator = np.random.RandomState(network_config.get("seed"))
         
         # NN Architecture
-        self.layer_sizes = [self.state_dim, self.num_hidden_units, self.num_actions]
+        self.layer_sizes = [self.state_dim, self.num_hidden_units_1, self.num_actions]
         
         # Weights
         self.weights = [dict() for i in range(0, len(self.layer_sizes) - 1)]
@@ -33,6 +34,10 @@ class ActionValueNetwork:
         psi = np.dot(s, W0) + b0
         x = np.maximum(psi, 0) # ReLu
         
+        # W1, b1 = self.weights[1]['W'], self.weights[1]['b']
+        # psi = np.dot(x, W1) + b1
+        # x = np.maximum(psi, 0) # ReLu
+
         W1, b1 = self.weights[1]['W'], self.weights[1]['b']
         q_vals = np.dot(x, W1) + b1
 
@@ -51,18 +56,27 @@ class ActionValueNetwork:
 
         W0, b0 = self.weights[0]['W'], self.weights[0]['b']
         W1, b1 = self.weights[1]['W'], self.weights[1]['b']
-        
-        psi = np.dot(s, W0) + b0
-        x = np.maximum(psi, 0)
-        dx = (psi > 0).astype(float)
+        #W2, b2 = self.weights[2]['W'], self.weights[2]['b'] # New
 
         td_update = [dict() for i in range(len(self.weights))]
-         
-        v = delta_mat
-        td_update[1]['W'] = np.dot(x.T, v) * 1. / s.shape[0]
-        td_update[1]['b'] = np.sum(v, axis=0, keepdims=True) * 1. / s.shape[0]
         
-        v = np.dot(v, W1.T) * dx
+        psi_0 = np.dot(s, W0) + b0
+        x_0 = np.maximum(psi_0, 0)
+        dx_0 = (psi_0 > 0).astype(float)
+
+        # psi_1 = np.dot(x_0, W1) + b1 # New
+        # x_1 = np.maximum(psi_1, 0) # New
+        # dx_1 = (psi_1 > 0).astype(float) # New
+     
+        v = delta_mat
+        td_update[1]['W'] = np.dot(x_0.T, v) * 1. / s.shape[0]
+        td_update[1]['b'] = np.sum(v, axis=0, keepdims=True) * 1. / s.shape[0]
+
+        # v = np.dot(v, W2.T) * dx_1
+        # td_update[1]['W'] = np.dot(x_0.T, v) * 1. / s.shape[0]
+        # td_update[1]['b'] = np.sum(v, axis=0, keepdims=True) * 1. / s.shape[0]
+        
+        v = np.dot(v, W1.T) * dx_0
         td_update[0]['W'] = np.dot(s.T, v) * 1. / s.shape[0]
         td_update[0]['b'] = np.sum(v, axis=0, keepdims=True) * 1. / s.shape[0]
                 
