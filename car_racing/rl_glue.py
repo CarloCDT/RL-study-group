@@ -5,6 +5,7 @@
 
 from __future__ import print_function
 import numpy as np
+import tensorflow as tf
 
 class RLGlue:
     """RLGlue class
@@ -22,6 +23,9 @@ class RLGlue:
         self.last_action = None
         self.num_steps = None
         self.num_episodes = None
+
+        # Pre load Computer Vision
+        self.model_cv = tf.keras.models.load_model('trained_networks/agent_012_trim.h5')
 
         # Set front of Car
         self.car_front = [65, 48]
@@ -48,7 +52,7 @@ class RLGlue:
 
     def transform_state(self, last_state):
 
-        if len(last_state)!=8: # I should be able to do this in a better way!
+        if len(last_state)!=6: # I should be able to do this in a better way!
             
             # Override state
 
@@ -95,23 +99,7 @@ class RLGlue:
                     full_right_sensor = i
                     break
 
-            ## Extra Sensors
-            front_road_sensor = self.car_front[0]
-            for i in range(self.car_front[0]):
-                pixel = last_state[self.car_front[0]-i, self.car_front[1], :]
-                if self.is_road(pixel) or np.sum(pixel)==0:
-                    front_road_sensor = i
-                    break
-
-            car_back = [self.car_front[0]+12, self.car_front[1]]
-            back_road_sensor = 96-car_back[0]
-            for i in range(96-car_back[0]):
-                pixel = last_state[car_back[0]+i, car_back[1], :]
-                if self.is_road(pixel) or np.sum(pixel)==0:
-                    back_road_sensor = 0
-                    break
-
-            return [round(speed, 2), front_sensor, left_sensor, full_left_sensor, right_sensor, full_right_sensor]
+            return [round(speed, 2), front_sensor, left_sensor, full_left_sensor, right_sensor, full_right_sensor] + list(np.array(self.model_cv.predict(np.expand_dims(last_state, axis=0), verbose=0)[0])/100)
         
         else:
             print("WARNING: Calling transform_state in a wrong place!")
@@ -196,27 +184,6 @@ class RLGlue:
 
         return this_observation
 
-    def rl_env_step(self, action):
-        """Step taken by the environment based on action from agent
-
-        Args:
-            action: Action taken by agent.
-
-        Returns:
-            (float, state, Boolean): reward, state observation, boolean
-                indicating termination.
-        """
-        ro = self.environment.env_step(action)
-        (this_reward, _, terminal) = ro
-
-        self.total_reward += this_reward
-
-        if terminal:
-            self.num_episodes += 1
-        else:
-            self.num_steps += 1
-
-        return ro
 
     def rl_step(self):
         """Step taken by RLGlue, takes environment step and either step or
@@ -226,8 +193,14 @@ class RLGlue:
             (float, state, action, Boolean): reward, last state observation,
                 last action, boolean indicating termination
         """
-        # acaaaaa
+        # Multiple Actions
+        # _ = self.environment.env_step(self.last_action)
+        # _ = self.environment.env_step(self.last_action)
+        # _ = self.environment.env_step(self.last_action)
         (reward, last_state, term) = self.environment.env_step(self.last_action)
+
+        # Render
+        self.environment.env.render()
         
         # New
         last_state = self.transform_state(last_state)
@@ -288,10 +261,24 @@ class RLGlue:
 
         self.rl_start()
 
+        #negative_reward_counter = negative_reward_counter + 1 if time_frame_counter > 100 and reward < 0 else 0
+        negative_reward_counter = 0
+
         while (not is_terminal) and ((max_steps_this_episode == 0) or
                                      (self.num_steps < max_steps_this_episode)):
             rl_step_result = self.rl_step()
+
+            if rl_step_result[0]<0:
+                negative_reward_counter+=1
+            else:
+                negative_reward_counter=0
+
             is_terminal = rl_step_result[3]
+            
+            if negative_reward_counter > 150:
+                #print("Negative Reward")
+                self.total_reward -= 50
+                is_terminal = 1
 
         return is_terminal
 
