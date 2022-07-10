@@ -31,33 +31,9 @@ class CarRacingDQNAgent:
         self.target_model    = self.build_model()
         self.update_target_model()
 
-    # def build_model(self):
-    #     # Neural Net for Deep-Q learning Model
-        
-    #     input_images = tf.keras.layers.Input(((96, 96, self.frame_stack_num)))
-    #     input_sensors = tf.keras.layers.Input(((6, self.frame_stack_num)))
-        
-    #     x = Conv2D(filters=6, kernel_size=(7, 7), strides=3, activation='relu', input_shape=(96, 96, self.frame_stack_num))(input_images)
-    #     x = MaxPooling2D(pool_size=(2, 2))(x)
-    #     x = Conv2D(filters=12, kernel_size=(4, 4), activation='relu')(x)
-    #     x = MaxPooling2D(pool_size=(2, 2))(x)
-    #     x = Flatten()(x)
-    #     x = Dense(216, activation='relu')(x)
-    #     output1 = Dense(16, activation='relu')(x) # New Addition
-
-    #     concatted = tf.keras.layers.Concatenate()([output1, input_sensors[:,:,0]])
-    #     x = Dense(16, activation='relu')(concatted)
-
-    #     outputs = Dense(len(self.action_space), activation=None)(x)
-
-    #     model = tf.keras.Model([input_images, input_sensors], outputs)
-    #     model.compile(loss='mean_squared_error', optimizer=Adam(lr=self.learning_rate, epsilon=1e-7))
-
-    #     return model
-
     def build_model(self):
+
         # Neural Net for Deep-Q learning Model
-        
         input_images = tf.keras.layers.Input(((96, 96, self.frame_stack_num)))
         
         x = Conv2D(filters=6, kernel_size=(7, 7), strides=3, activation='relu', input_shape=(96, 96, self.frame_stack_num))(input_images)
