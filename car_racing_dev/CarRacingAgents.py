@@ -302,7 +302,8 @@ class CarRacingAgent01:
         epsilon_min = 0.1,
         epsilon_decay = 0.9999,
         learning_rate = 0.001,
-        name = 'agent_01'
+        name = 'agent_01',
+        hidden_neurons = 64
     ):
         self.action_space = action_space
         self.frame_stack_num = frame_stack_num
@@ -312,10 +313,13 @@ class CarRacingAgent01:
         self.epsilon_min = epsilon_min
         self.epsilon_decay = epsilon_decay
         self.learning_rate = learning_rate
+ 
+        self.name = name
+        self.hidden_neurons = hidden_neurons
+
         self.model = self.build_model()
         self.target_model = self.build_model()
         self.update_target_model()
-        self.name = name
         
         # Plots
         self.results = []
@@ -383,7 +387,7 @@ class CarRacingAgent01:
 
         input_sensors = tf.keras.layers.Input(((6, self.frame_stack_num)))
         
-        x = Dense(16, activation='relu')(input_sensors[:,:,-1])
+        x = Dense(self.hidden_neurons, activation='relu')(input_sensors[:,:,-1])
         outputs = Dense(len(self.action_space), activation=None)(x)
         model = tf.keras.Model(input_sensors, outputs)
         model.compile(loss='mean_squared_error', optimizer=Adam(learning_rate=self.learning_rate, epsilon=1e-7))
